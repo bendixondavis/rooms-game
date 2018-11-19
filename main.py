@@ -1,5 +1,7 @@
 from player import Player
 from room import Room
+from house import House
+from graph import Graph
 
 def get_story_item(text,tag):
     #this method is given a string and a tag, it searches for the tag
@@ -15,11 +17,11 @@ def get_story_item(text,tag):
 def init_rooms():
     #initialize all rooms with their text description and adjacent rooms
     #returns list of all rooms
-    entry = Room(get_story_item(story,"[Entry]"),[["closet","bedroom","kitchen"],['F','R','L']])
-    closet = Room(get_story_item(story,"[Closet]"),["entry"])
-    bathroom = Room(get_story_item(story,"[Bathroom]"),["bedroom"])
-    kitchen = Room(get_story_item(story,"[Kitchen]"),["entry"])
-    bedroom = Room(get_story_item(story,"[Bedroom]"),["entry","bathroom"])
+    entry = Room('entry',get_story_item(story,"[Entry]"),[["closet","bedroom","kitchen"],['F','R','L']])
+    closet = Room('closet',get_story_item(story,"[Closet]"),["entry"])
+    bathroom = Room('bathroom',get_story_item(story,"[Bathroom]"),["bedroom"])
+    kitchen = Room('kitchen',get_story_item(story,"[Kitchen]"),["entry"])
+    bedroom = Room('bedroom',get_story_item(story,"[Bedroom]"),["entry","bathroom"])
     rooms = [entry,closet,bathroom,kitchen,bedroom]
     return rooms
 
@@ -31,7 +33,7 @@ def get_player_name():
     return player_name
 
 def get_direction():
-    pick = input("Do you want to go Right(R), Left(L), Forward(F), Backward(B) or Run(R)?")
+    pick = input("Do you want to go Right(R), Left(L), Forward(F), Backward(B) or Quit(Q)?")
     return pick
 
 def get_rooms_connect(graph,key):
@@ -42,15 +44,17 @@ def main():
     player = Player(get_player_name())   #get input for player name
     intro(player.first_name)   #format player name into intro text
     rooms = init_rooms()
-    current_room = "entry"
+    house = House(rooms,rooms[0])
+    map = house.init_house_graph()
     rooms[0].print_text()    #output entryway text
-    print(rooms[0].get_adjacent())
     choice = get_direction()
 
     #state machine loop
-    while choice != "R":
-        if current_room == "entry":
-            choice = get_direction()
+    while choice != "Q":
+        choice = get_direction()
+        if house.get_current_room() == "entry":
+            next_rooms = rooms[0].get_adjacent()
+
             #if choice == ''
 
 # 0 in map represents haven't been to that room,
