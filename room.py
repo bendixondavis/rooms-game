@@ -7,5 +7,8 @@ class Room:
     def print_text(self):
         print(self.text)
 
+    def get_title(self):
+        return self.title
+
     def get_adjacent(self):
         return self.adjacent_rooms

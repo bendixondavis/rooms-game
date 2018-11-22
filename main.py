@@ -1,7 +1,6 @@
 from player import Player
 from room import Room
 from house import House
-from graph import Graph
 
 def get_story_item(text,tag):
     #this method is given a string and a tag, it searches for the tag
@@ -16,12 +15,19 @@ def get_story_item(text,tag):
 
 def init_rooms():
     #initialize all rooms with their text description and adjacent rooms
+    #adjacent rooms in format of [forward,backward,right,left,up,down]
+    #use blank string to show that you can't move in that direction
     #returns list of all rooms
-    entry = Room('entry',get_story_item(story,"[Entry]"),[["closet","bedroom","kitchen"],['F','R','L']])
-    closet = Room('closet',get_story_item(story,"[Closet]"),["entry"])
-    bathroom = Room('bathroom',get_story_item(story,"[Bathroom]"),["bedroom"])
-    kitchen = Room('kitchen',get_story_item(story,"[Kitchen]"),["entry"])
-    bedroom = Room('bedroom',get_story_item(story,"[Bedroom]"),["entry","bathroom"])
+    entry = Room('entry',get_story_item(story,"[Entry]"),
+            ["closet",'',"bedroom","kitchen",'',''])
+    closet = Room('closet',get_story_item(story,"[Closet]"),
+            ['',"entry",'','','',''])
+    bathroom = Room('bathroom',get_story_item(story,"[Bathroom]"),
+            ['',"bedroom",'','','',''])
+    kitchen = Room('kitchen',get_story_item(story,"[Kitchen]"),
+            ['',"entry",'','','',''])
+    bedroom = Room('bedroom',get_story_item(story,"[Bedroom]"),
+            ['',"entry","bathroom",'','',''])
     rooms = [entry,closet,bathroom,kitchen,bedroom]
     return rooms
 
@@ -33,7 +39,8 @@ def get_player_name():
     return player_name
 
 def get_direction():
-    pick = input("Do you want to go Right(R), Left(L), Forward(F), Backward(B) or Quit(Q)?")
+    pick = input("Do you want to go Forward(F), Backward(B), "
+                "Right(R), Left(L), Up(U), Down(D) or Quit(Q)?")
     return pick
 
 def get_rooms_connect(graph,key):
@@ -46,31 +53,54 @@ def main():
     rooms = init_rooms()
     house = House(rooms,rooms[0])
     map = house.init_house_graph()
-    rooms[0].print_text()    #output entryway text
-    choice = get_direction()
 
     #state machine loop
-    while choice != "Q":
+    while True:
+        room_in = house.get_current_room()
+        room_in.print_text()
         choice = get_direction()
-        if house.get_current_room() == "entry":
-            next_rooms = rooms[0].get_adjacent()
+        next_rooms = room_in.get_adjacent()
 
-            #if choice == ''
-
-# 0 in map represents haven't been to that room,
-# 1 repesents have been to it, X repesents current room
-map = [0,0,0]
+        #these if statements index the list of adjacent rooms to move to next room
+        if choice == 'F':
+            if next_rooms[0] != '':
+                print(next_rooms[0])
+                house.set_current_room(next_rooms[0])
+            else:
+                print("can't go that way...")
+        if choice == 'B':
+            if next_rooms[1] != '':
+                house.set_current_room(next_rooms[1])
+            else:
+                print("can't go that way...")
+        if choice == 'R':
+            if next_rooms[2] != '':
+                house.set_current_room(next_rooms[2])
+            else:
+                print("can't go that way...")
+        if choice == 'L':
+            if next_rooms[3] != '':
+                house.set_current_room(next_rooms[3])
+            else:
+                print("can't go that way...")
+        if choice == 'U':
+            if next_rooms[4] != '':
+                house.set_current_room(next_rooms[4])
+            else:
+                print("can't go that way...")
+        if choice == 'D':
+            if next_rooms[5] != '':
+                house.set_current_room(next_rooms[5])
+            else:
+                print("can't go that way...")
+        if choice == 'Q':
+            break
 
 bin_file = open("rooms.bin","rb")   #opens bin file that contains all of the story text
 story = bin_file.read().decode()    #reads the contents of the file into a string
 
 #initialize text description for the game intro
 intro_text = get_story_item(story,"[Intro]")
-house = {"entry":["closet","bedroom","kitchen"],
-        "closet":["entry"],
-        "bathroom":["bedroom"],
-        "kitchen":["entry"],
-        "bedroom":["entry","bathroom"]}
 
 if __name__=="__main__":
     main()
